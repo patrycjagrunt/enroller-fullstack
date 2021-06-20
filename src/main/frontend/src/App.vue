@@ -40,7 +40,7 @@
                 this.clearMessage();
                 this.$http.post('participants', user)
                     .then(() => {
-                        this.success('Konto zostało założone. Możesz się zalogować.');
+                        this.success('Konto zostało założone. Zaloguj się.');
                         this.registering = false;
                     })
                     .catch(response => this.failure('Błąd przy zakładaniu konta. Kod odpowiedzi: ' + response.status));
