@@ -31,7 +31,13 @@
         },
         methods: {
             addNewMeeting(meeting) {
-                this.meetings.push(meeting);
+				this.meetings.push(meeting);
+                this.$http.post('meetings', meeting)
+                    .then(() => {
+                        this.success('Spotkanie zostało założone. Kliknij zapisz się, aby dołączyć do spotkania.');
+                        this.registering = false;
+                    })
+                    .catch(response => this.failure('Błąd przy zakładaniu spotkania. Kod odpowiedzi: ' + response.status));
             },
             addMeetingParticipant(meeting) {
                 meeting.participants.push(this.username);
@@ -40,7 +46,10 @@
                 meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
             },
             deleteMeeting(meeting) {
-                this.meetings.splice(this.meetings.indexOf(meeting), 1);
+			    this.meetings.splice(this.meetings.indexOf(meeting), 1);
+				var id = meeting.id;
+				this.$http.delete('meetings/{id}', meeting).then(() => {
+                    this.get('meetings').then(response => {this.meetings = response.body;})});
             }
         }
     }

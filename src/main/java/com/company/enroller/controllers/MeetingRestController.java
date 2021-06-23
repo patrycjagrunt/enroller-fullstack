@@ -19,20 +19,19 @@ import java.util.Collection;
 @RequestMapping("/api/meetings")
 public class MeetingRestController {
 
-    @Autowired
-    MeetingService meetingService;
+	@Autowired
+	MeetingService meetingService;
 
-    @Autowired
-    ParticipantService participantService;
+	@Autowired
+	ParticipantService participantService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> getMeetings() {
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<?> getMeetings() {
+		Collection<Meeting> meetings = meetingService.getAll();
+		return new ResponseEntity<Collection<Meeting>>(meetings, HttpStatus.OK);
+	}
 
-        Collection<Meeting> meetings = meetingService.getAll();
-        return new ResponseEntity<Collection<Meeting>>(meetings, HttpStatus.OK);
-    }
-    
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getMeetings(@PathVariable("id") long id) {
 		Meeting meeting = meetingService.findById(id);
 		if (meeting == null) {
@@ -40,19 +39,23 @@ public class MeetingRestController {
 		}
 		return new ResponseEntity<Meeting>(meeting, HttpStatus.OK);
 	}
-    
-    @RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<?> organizeMeetings(@RequestBody Meeting meeting) {
+
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	public ResponseEntity<?> addMeetings(@RequestBody Meeting meeting) {
 		if (meetingService.findById(meeting.getId()) != null) {
-			return new ResponseEntity<String>("Unable to organize meeting with id '" + meeting.getId(),
-					HttpStatus.CONFLICT);
+			return new ResponseEntity<String>("Nie można utworzyć spotkania.", HttpStatus.CONFLICT);
 		}
-		meetingService.add(meeting);
+		meetingService.addNewMeeting(meeting);
 		return new ResponseEntity<Meeting>(HttpStatus.CREATED);
 	}
-    
-    
 
-    
-    
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable("id") long id) {
+    	Meeting meeting = meetingService.findById(id);
+        if (meeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+		meetingService.delete(meeting);
+		return new ResponseEntity<Meeting>(HttpStatus.CREATED);
+    }
 }

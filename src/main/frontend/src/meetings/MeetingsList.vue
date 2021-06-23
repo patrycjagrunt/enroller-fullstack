@@ -19,8 +19,9 @@
           </li>
         </ul>
       </td>
-      <td style="text-align: right; min-width: 400px">
-        <button v-if="meeting.participants.indexOf(username) < 0" class="button-outline"
+      <td style="text-align: right; min-width: 400px" v-if="meeting.participants">
+        <button v-if="meeting.participants.indexOf(username) < 0"
+                class="button-outline"
                 @click="$emit('attend', meeting)">
           Zapisz się
         </button>
@@ -36,6 +37,31 @@
 
 <script>
     export default {
-        props: ['meetings', 'username']
+        props: ['meetings', 'username'],
+		
+		methods: {
+			addNewMeeting() {
+				this.error = false;
+				if (this.addNewMeeting.title) {
+					this.$http.post('meetings', this.addNewMeeting).then(() =>{
+						this.success('Spotkanie zostało założone. Kliknij zapisz się, aby dołączyć do spotkania.');
+						this.registering = false;})
+					.catch(response=> this.failure('Nie udało się dodać spotkania.'));
+						this.$emit('adding', this.addNewMeeting);
+						this.addNewMeeting= {participants: []};
+						this.adding = false;
+				} else {
+					this.error=true;
+				}
+			
+			},
+			deleteMeeting(id) {
+				this.axios.delete('meetings',{
+				action: 'delete',
+				id:id
+				}).then(response =>
+					this.success('Spotkanie usunięto'));
+			}
+		}
     }
 </script>
